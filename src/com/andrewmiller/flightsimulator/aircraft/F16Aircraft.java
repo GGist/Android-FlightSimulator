@@ -5,23 +5,21 @@ import static android.opengl.GLES20.glDrawArrays;
 
 import com.andrewmiller.flightsimulator.container.GLESArray;
 import com.andrewmiller.flightsimulator.shaders.ColorShader;
-import com.andrewmiller.flightsimulator.utility.Geometry.Circle;
-import com.andrewmiller.flightsimulator.utility.Geometry.Point;
-import com.andrewmiller.flightsimulator.utility.GeometryHelper;
+import com.andrewmiller.flightsimulator.utility.BasicGeometry.Circle;
+import com.andrewmiller.flightsimulator.utility.BasicGeometry.Point;
+import com.andrewmiller.flightsimulator.utility.AdvancedGeometry;
 
 public class F16Aircraft extends Aircraft<F16Aircraft> {
+	
 	private final static int NUM_POSITION_COMPONENTS = 3;
-	private AircraftData myData;
-	private final GLESArray vertexData;
 	private int vertexOffset = 0;
+	private AircraftData myData;
+	private AttachmentData assembleInfo;
+	private GLESArray vertexData;
 	
 	public F16Aircraft() {
-		/*
-		myData = new AircraftBuilder(100002)
-		.appendFuselage(new Circle(new Point(0.5f, 0f, 0f), 0.2f), 100000)
-		.build();
-		*/
-		myData = appendCockpit(100)
+		assembleInfo = new AttachmentData();
+		myData = createFuselage(10)
 				.build();
 		vertexData = new GLESArray(myData.vertexData);
 	}
@@ -38,13 +36,8 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 		}
 	}
 
-	public F16Aircraft appendCowl(int numPoints) {
-
-		return this;
-	}
-
-	public F16Aircraft appendCockpit(int numPoints) {
-		float[] cockpitData = GeometryHelper.gen2DCircle(new Circle(new Point(0, 0, 0), 1f), numPoints);
+	public F16Aircraft createFuselage(int numPoints) {
+		float[] cockpitData = AdvancedGeometry.gen2DCircle(new Circle(new Point(0, 0, 0), 1f), numPoints);
 		final int numVertices = (cockpitData.length / NUM_POSITION_COMPONENTS);
 		final int vertOffset = vertexOffset;
 		vertexOffset += cockpitData.length;
@@ -57,18 +50,23 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 		
 		return this;
 	}
-
-	public F16Aircraft appendFuselage(int numPoints) {
-
-		return this;
-	}
-
-	public F16Aircraft appendFrontWing(int numPoints) {
+	
+	public F16Aircraft appendCowl(int numPoints) {
 
 		return this;
 	}
 
-	public F16Aircraft appendBackWing(int numPoints) {
+	public F16Aircraft appendCockpit(int numPoints) {
+		
+		return this;
+	}
+
+	public F16Aircraft appendFrontWings(int numPoints) {
+
+		return this;
+	}
+
+	public F16Aircraft appendBackWings(int numPoints) {
 
 		return this;
 	}

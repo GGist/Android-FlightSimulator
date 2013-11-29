@@ -1,20 +1,52 @@
 package com.andrewmiller.flightsimulator.aircraft;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 
 import com.andrewmiller.flightsimulator.container.FloatArray;
 
 public abstract class Aircraft<T> {
+	//Data Storage Objects
 	
-	//Used to encapsulate OpenGL draw calls that are meant to be aggregated
-	public interface DrawMethod {
+	//Encapsulates GLES draw calls
+	protected interface DrawMethod {
 		void draw();
 	}
 	
-	//Used to encapsulate the data and draw calls that make up the OpenGL vertex 
-	//data for a sub-class
-	public static class AircraftData {
+	//Encapsulates attachment points for aircraft parts
+	protected static class AttachmentData {
+		public enum Point {
+			COWL,
+			COCKPIT,
+			FRONT_LEFT_WING,
+			FRONT_RIGHT_WING,
+			BACK_LEFT_WING,
+			BACK_RIGHT_WING,
+			FIN,
+			EXHAUST
+		};
+		
+		private final EnumMap<Point, Float> map;
+		
+		public AttachmentData() {
+			map = new EnumMap<Point, Float>(Point.class);
+		}
+		
+		public void setAttachPoint(Point key, float value) {
+			map.put(key, Float.valueOf(value));
+		}
+		
+		public float getAttachPoint(Point key) throws IllegalArgumentException {
+			if (map.get(key) == null)
+				throw new IllegalArgumentException("Attachment Point Has Not Been Set");
+			
+			return map.get(key).floatValue();
+		}
+	}
+	
+	//Encapsulates aircraft vertex data and draw call aggregate
+	protected static class AircraftData {
 		public final float[] vertexData;
 		public final List<DrawMethod> drawCalls;
 		
@@ -24,15 +56,17 @@ public abstract class Aircraft<T> {
 		}
 	}
 	
-	private FloatArray vertexData = new FloatArray();
-	private List<DrawMethod> drawCalls = new ArrayList<DrawMethod>();
+	//Class Body
+	private FloatArray vertexData = null;
+	private List<DrawMethod> drawCalls = null;
 	
 	public AircraftData build() {
 		FloatArray vData = vertexData;
 		List<DrawMethod> dCalls = drawCalls;
 		
-		//vertexData = null;
-		//dCalls = null;
+		//Allocate new data storage if appending->building again
+		vertexData = null;
+		drawCalls = null;
 		
 		return new AircraftData(vData.asArray(), dCalls);
 	}
@@ -47,15 +81,15 @@ public abstract class Aircraft<T> {
 		drawCalls.add(dCall);
 	}
 	
+	public abstract T createFuselage(int numPoints);
+	
 	public abstract T appendCowl(int numPoints);
 	
 	public abstract T appendCockpit(int numPoints);
 	
-	public abstract T appendFuselage(int numPoints);
+	public abstract T appendFrontWings(int numPoints);
 	
-	public abstract T appendFrontWing(int numPoints);
-	
-	public abstract T appendBackWing(int numPoints);
+	public abstract T appendBackWings(int numPoints);
 	
 	public abstract T appendFin(int numPoints);
 	

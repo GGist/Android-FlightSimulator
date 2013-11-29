@@ -1,6 +1,6 @@
 package com.andrewmiller.flightsimulator.utility;
 
-public class Geometry {
+public class BasicGeometry {
 	public static class Point {
 		public final float x, y, z;
 		

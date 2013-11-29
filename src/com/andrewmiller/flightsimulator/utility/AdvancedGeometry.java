@@ -1,9 +1,9 @@
 package com.andrewmiller.flightsimulator.utility;
 
 import com.andrewmiller.flightsimulator.android.Constants;
-import com.andrewmiller.flightsimulator.utility.Geometry.Circle;
+import com.andrewmiller.flightsimulator.utility.BasicGeometry.Circle;
 
-public abstract class GeometryHelper {
+public abstract class AdvancedGeometry {
 	private static final String TAG = "ShapeGenerator";
 	
 	private final static int NUM_POSITION_COMPONENTS = Constants.NUM_POSITION_COMPONENTS;
