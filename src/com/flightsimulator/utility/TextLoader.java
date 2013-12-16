@@ -1,4 +1,4 @@
-package com.andrewmiller.flightsimulator.utility;
+package com.flightsimulator.utility;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,8 +8,8 @@ import java.io.InputStreamReader;
 import android.content.Context;
 import android.content.res.Resources;
 
-public class TextReader {
-	private static final String TAG = "TextReader";
+public class TextLoader {
+	private static final String TAG = "TextLoader";
 	
 	public static String getTextFromFile(Context context, int fileId) {
 		StringBuilder fileContents = new StringBuilder();

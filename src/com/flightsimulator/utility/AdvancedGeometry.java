@@ -1,7 +1,7 @@
-package com.andrewmiller.flightsimulator.utility;
+package com.flightsimulator.utility;
 
-import com.andrewmiller.flightsimulator.android.Constants;
-import com.andrewmiller.flightsimulator.utility.BasicGeometry.Circle;
+import com.flightsimulator.android.Constants;
+import com.flightsimulator.utility.BasicGeometry.Circle;
 
 public abstract class AdvancedGeometry {
 	private static final String TAG = "ShapeGenerator";

@@ -1,4 +1,4 @@
-package com.andrewmiller.flightsimulator.android;
+package com.flightsimulator.android;
 
 import android.app.Activity;
 import android.app.ActivityManager;

@@ -1,4 +1,4 @@
-package com.andrewmiller.flightsimulator.shaders;
+package com.flightsimulator.shaders;
 
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
@@ -18,5 +18,13 @@ public class TextureShader extends Shader {
 		
         uColorLocation = glGetUniformLocation(program, "u_Color");
 		aPositionLocation = glGetAttribLocation(program, "a_Position");
+	}
+	
+	public int getPositionAttribLocation() {
+		return aPositionLocation;
+	}
+	
+	public int getColorUniformLocation() {
+		return uColorLocation;
 	}
 }

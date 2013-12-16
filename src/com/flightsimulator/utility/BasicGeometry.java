@@ -1,4 +1,4 @@
-package com.andrewmiller.flightsimulator.utility;
+package com.flightsimulator.utility;
 
 public class BasicGeometry {
 	public static class Point {
@@ -9,7 +9,6 @@ public class BasicGeometry {
 			this.y = y;
 			this.z = z;
 		}
-
 	}
 	
 	public static class Circle {
@@ -31,7 +30,7 @@ public class BasicGeometry {
 			this.height = height;
 		}
 	}
-	
+	/*
 	private static class Vector {
 		
 	}
@@ -39,5 +38,5 @@ public class BasicGeometry {
 	private static class Ray {
 		
 	}
-	
+	*/
 }

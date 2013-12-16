@@ -1,4 +1,4 @@
-package com.andrewmiller.flightsimulator.container;
+package com.flightsimulator.container;
 
 import static android.opengl.GLES20.GL_BYTE;
 import static android.opengl.GLES20.GL_FLOAT;

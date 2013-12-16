@@ -1,13 +1,10 @@
-package com.andrewmiller.flightsimulator.aircraft;
+package com.flightsimulator.aircraft;
 
-import static android.opengl.GLES20.GL_TRIANGLE_FAN;
+import static android.opengl.GLES20.GL_POINTS;
 import static android.opengl.GLES20.glDrawArrays;
 
-import com.andrewmiller.flightsimulator.container.GLESArray;
-import com.andrewmiller.flightsimulator.shaders.ColorShader;
-import com.andrewmiller.flightsimulator.utility.BasicGeometry.Circle;
-import com.andrewmiller.flightsimulator.utility.BasicGeometry.Point;
-import com.andrewmiller.flightsimulator.utility.AdvancedGeometry;
+import com.flightsimulator.container.GLESArray;
+import com.flightsimulator.shaders.ColorShader;
 
 public class F16Aircraft extends Aircraft<F16Aircraft> {
 	
@@ -19,7 +16,7 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 	
 	public F16Aircraft() {
 		assembleInfo = new AttachmentData();
-		myData = createFuselage(10)
+		myData = createFuselage(3)
 				.build();
 		vertexData = new GLESArray(myData.vertexData);
 	}
@@ -37,7 +34,48 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 	}
 
 	public F16Aircraft createFuselage(int numPoints) {
-		float[] cockpitData = AdvancedGeometry.gen2DCircle(new Circle(new Point(0, 0, 0), 1f), numPoints);
+		float[] array = new float[3];
+		array[0] = -1;
+		array[1] = -1;
+		array[2] = -1;
+		/*
+		array[3] = 1;
+		array[4] = -1;
+		array[5] = 1;
+		
+		array[6] = -1;
+		array[7] = -1;
+		array[8] = 1;
+		
+		array[9] = -1;
+		array[10] = -1;
+		array[11] = -1;
+		
+		array[12] = 1;
+		array[13] = 1;
+		array[14] = -1;
+		
+		array[15] = 1;
+		array[16] = 1;
+		array[17] = 1;
+		
+		array[18] = -1;
+		array[19] = 1;
+		array[20] = 1;
+		
+		array[21] = -1;
+		array[22] = 1;
+		array[23] = -1;
+		*/
+		final int numVertices = (array.length / NUM_POSITION_COMPONENTS);
+		final int vertOffset = vertexOffset;
+		vertexOffset += array.length;
+		appendData(array, new DrawMethod() {
+			public void draw() {
+				glDrawArrays(GL_POINTS, vertOffset, numVertices);
+			}
+		});
+		/*float[] cockpitData = AdvancedGeometry.gen2DCircle(new Circle(new Point(0, 0, 0), 1f), numPoints);
 		final int numVertices = (cockpitData.length / NUM_POSITION_COMPONENTS);
 		final int vertOffset = vertexOffset;
 		vertexOffset += cockpitData.length;
@@ -47,7 +85,7 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 				glDrawArrays(GL_TRIANGLE_FAN, vertOffset, numVertices);
 			}
 		});
-		
+		*/
 		return this;
 	}
 	

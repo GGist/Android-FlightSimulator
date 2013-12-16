@@ -1,9 +1,9 @@
-package com.andrewmiller.flightsimulator.container;
+package com.flightsimulator.container;
 
 public class FloatArray {
 	
 	private float[] array = null;
-	private final int defSize = 50, 
+	private final int defSize = 25, 
 					  resizeFactor = 2;
 	private int index = 0;
 	

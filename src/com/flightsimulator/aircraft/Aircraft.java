@@ -1,10 +1,10 @@
-package com.andrewmiller.flightsimulator.aircraft;
+package com.flightsimulator.aircraft;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import com.andrewmiller.flightsimulator.container.FloatArray;
+import com.flightsimulator.container.FloatArray;
 
 public abstract class Aircraft<T> {
 	//Data Storage Objects

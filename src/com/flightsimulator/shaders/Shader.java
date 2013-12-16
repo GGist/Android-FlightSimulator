@@ -1,4 +1,4 @@
-package com.andrewmiller.flightsimulator.shaders;
+package com.flightsimulator.shaders;
 
 import static android.opengl.GLES20.GL_COMPILE_STATUS;
 import static android.opengl.GLES20.GL_FRAGMENT_SHADER;
@@ -20,8 +20,8 @@ import static android.opengl.GLES20.glUseProgram;
 import android.content.Context;
 import android.util.Log;
 
-import com.andrewmiller.flightsimulator.utility.LoggerStatus;
-import com.andrewmiller.flightsimulator.utility.TextReader;
+import com.flightsimulator.utility.LoggerStatus;
+import com.flightsimulator.utility.TextLoader;
 
 public class Shader {
 	private static final String TAG = "Shader";
@@ -31,8 +31,8 @@ public class Shader {
 	private int fragmentShaderId;
 	
 	public Shader(Context context, int vertexSourceId, int fragmentSourceId) {
-		program = buildProgram(TextReader.getTextFromFile(context, vertexSourceId), 
-				TextReader.getTextFromFile(context, fragmentSourceId));
+		program = buildProgram(TextLoader.getTextFromFile(context, vertexSourceId), 
+				TextLoader.getTextFromFile(context, fragmentSourceId));
 	}
 
 	public void setProgramActive() {
