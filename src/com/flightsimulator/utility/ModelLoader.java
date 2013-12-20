@@ -5,16 +5,17 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.util.Log;
 
+import com.flightsimulator.android.Constants;
 import com.flightsimulator.container.Vec.Vec2;
 import com.flightsimulator.container.Vec.Vec3;
 
 public class ModelLoader {
 	private static final String TAG = "ModelLoader";
-
+	private static final int POSITION_COMPONENTS = Constants.NUM_POSITION_COMPONENTS;
 	private String contents;
 	
-	private ArrayList<Long> vertIndices = new ArrayList<Long>(), uvIndices = new ArrayList<Long>(), 
-			normIndices = new ArrayList<Long>();
+	private ArrayList<Integer> vertIndices = new ArrayList<Integer>(), uvIndices = new ArrayList<Integer>(), 
+			normIndices = new ArrayList<Integer>();
 	private ArrayList<Vec3<Float>> tempVert = new ArrayList<Vec3<Float>>(), tempNorm = new ArrayList<Vec3<Float>>();
 	private ArrayList<Vec2<Float>> tempUV = new ArrayList<Vec2<Float>>();
 	
@@ -25,6 +26,15 @@ public class ModelLoader {
 		if (!parseFile(startIndex) && LoggerStatus.ON) {
 			Log.e(TAG, "Error parsing OBJ file: " + contents.substring(0, startIndex));
 		}
+		
+		vertIndices.trimToSize();
+		uvIndices.trimToSize();
+		normIndices.trimToSize();
+		tempVert.trimToSize();
+		tempNorm.trimToSize();
+		tempUV.trimToSize();
+		
+		
 		
 		System.out.println("Vertices:");
 		for (int i = 0; i < tempVert.size(); ++i) {
@@ -47,6 +57,22 @@ public class ModelLoader {
 		}
 	}
 	
+	public float[] getVertexArray() {
+		float[] vertices = new float[vertIndices.size() * POSITION_COMPONENTS];
+		Vec3<Float> temp;
+		int index = 0;
+		
+		for (int i = 0; i < vertIndices.size() * 3; i += 3) {
+			temp = tempVert.get(vertIndices.get(index) - 1);
+			vertices[i] = temp.x;
+			vertices[i + 1] = temp.y;
+			vertices[i + 2] = temp.z;
+			++index;
+		}
+		
+		return vertices;
+	}
+	
 	//Returns false if character at start is not valid
 	private boolean parseFile(int start) {
 
@@ -54,20 +80,21 @@ public class ModelLoader {
 			if (contents.charAt(start) == 'v') {
 				++start;
 				if (contents.charAt(start) == ' ') {
-					start = parseNumbers('v', start + 1) - 1;
+					start = parseNumbers('v', start + 1);
 				} else if (contents.charAt(start) == 't') {
-					start = parseNumbers('t', start + 2) - 1;
+					start = parseNumbers('t', start + 2);
 				} else if (contents.charAt(start) == 'n') {
-					start = parseNumbers('n', start + 2) - 1;
+					start = parseNumbers('n', start + 2);
 				}
 				
 				//Invalid type in parseNumbers()
 				if (start == -1)
 					return false;
 			} else if (contents.charAt(start) == 'f') {
-				start = parseNumbers('f', start + 2) - 1;
+				start = parseNumbers('f', start + 2);
+			} else {
+				++start;
 			}
-			++start;
 		}
 		
 		return true;
@@ -116,6 +143,7 @@ public class ModelLoader {
 	
 	//Returns false if type was invalid
 	private boolean appendNumber(char type, String data) {
+		System.out.println(data);
 		float vertice;
 		
 		switch (type)
@@ -171,12 +199,14 @@ public class ModelLoader {
 			break;
 		case 'f':
 			//Should come in as v/t/n or v//n
-			vertIndices.add(Long.parseLong((data.substring(0, 1))));
-			if (data.charAt(2) != '/') {
-				uvIndices.add(Long.parseLong(data.substring(2, 3)));
-				normIndices.add(Long.parseLong(data.substring(4, 5)));
+			int firstSlash = data.indexOf('/');
+			vertIndices.add(Integer.parseInt((data.substring(0, firstSlash))));
+			if (data.charAt(firstSlash + 1) != '/') {
+				int secondSlash = data.indexOf('/', firstSlash + 1);
+				uvIndices.add(Integer.parseInt(data.substring(firstSlash + 1, secondSlash)));
+				normIndices.add(Integer.parseInt(data.substring(secondSlash + 1, data.length())));
 			} else {
-				normIndices.add(Long.parseLong(data.substring(3, 4)));
+				normIndices.add(Integer.parseInt(data.substring(firstSlash + 2, data.length())));
 			}
 			break;
 		default:

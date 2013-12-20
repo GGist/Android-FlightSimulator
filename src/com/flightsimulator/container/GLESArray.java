@@ -32,26 +32,34 @@ public class GLESArray {
 	};
 	
 	private final Buffer data;
+	private final int size;
 	private final DataType bufferType;
 	
 	public GLESArray(byte[] array) {
-		data = allocateMemory(array.length, BYTES_PER_BYTE)
+		size = array.length;
+		data = allocateMemory(size, BYTES_PER_BYTE)
 				.put(array);
 		bufferType = DataType.BYTE;
 	}
 	
 	public GLESArray(float[] array) {
-		data = allocateMemory(array.length, BYTES_PER_FLOAT)
+		size = array.length;
+		data = allocateMemory(size, BYTES_PER_FLOAT)
 				.asFloatBuffer()
 				.put(array);
 		bufferType = DataType.FLOAT;
 	}
 	
 	public GLESArray(int[] array) {
-		data = allocateMemory(array.length, BYTES_PER_INT)
+		size = array.length;
+		data = allocateMemory(size, BYTES_PER_INT)
 				.asIntBuffer()
 				.put(array);
 		bufferType = DataType.INT;
+	}
+	
+	public int getSize() {
+		return size;
 	}
 
 	public void setVertexAttribPtr(int dataOffset, int attribLocation,
