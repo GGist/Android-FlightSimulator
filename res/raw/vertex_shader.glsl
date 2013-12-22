@@ -7,5 +7,5 @@ varying vec4 test;
 void main()
 {
 	test = a_Position;
-	gl_Position = a_Position * u_Matrix;
+	gl_Position = u_Matrix * a_Position;
 }

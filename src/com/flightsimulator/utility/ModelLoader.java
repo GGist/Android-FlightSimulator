@@ -20,8 +20,8 @@ public class ModelLoader {
 	private ArrayList<Vec2<Float>> tempUV = new ArrayList<Vec2<Float>>();
 	
 	public ModelLoader(Context context, int fileId) {
-		contents = TextLoader.getTextFromFile(context, fileId);
-		int startIndex = contents.indexOf('v', contents.lastIndexOf('#'));
+		contents = TextLoader.getTextFromFile(context, fileId) + " ";
+		int startIndex = 0;
 
 		if (!parseFile(startIndex) && LoggerStatus.ON) {
 			Log.e(TAG, "Error parsing OBJ file: " + contents.substring(0, startIndex));
@@ -34,8 +34,7 @@ public class ModelLoader {
 		tempNorm.trimToSize();
 		tempUV.trimToSize();
 		
-		
-		
+		/*
 		System.out.println("Vertices:");
 		for (int i = 0; i < tempVert.size(); ++i) {
 			System.out.println(tempVert.get(i).x + " " + tempVert.get(i).y + " " + tempVert.get(i).z);
@@ -55,13 +54,14 @@ public class ModelLoader {
 		for (int i = 0; i < vertIndices.size(); ++i) {
 			System.out.println(vertIndices.get(i).longValue() + "//" + normIndices.get(i).longValue());
 		}
+		*/
 	}
 	
 	public float[] getVertexArray() {
 		float[] vertices = new float[vertIndices.size() * POSITION_COMPONENTS];
 		Vec3<Float> temp;
 		int index = 0;
-		
+
 		for (int i = 0; i < vertIndices.size() * 3; i += 3) {
 			temp = tempVert.get(vertIndices.get(index) - 1);
 			vertices[i] = temp.x;
@@ -143,7 +143,7 @@ public class ModelLoader {
 	
 	//Returns false if type was invalid
 	private boolean appendNumber(char type, String data) {
-		System.out.println(data);
+		
 		float vertice;
 		
 		switch (type)

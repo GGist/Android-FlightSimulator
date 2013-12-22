@@ -9,6 +9,7 @@ import static android.opengl.GLES20.glUniform4f;
 import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glViewport;
 import static android.opengl.GLES20.glEnable;
+import static android.opengl.GLES20.glDisable;
 import static android.opengl.GLES20.GL_DEPTH_TEST;
 import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
 import static android.opengl.Matrix.setIdentityM;
@@ -42,18 +43,19 @@ public class SimulatorRenderer implements Renderer {
 	F16Aircraft myAircraft;
 	
 	private GLESArray myArray;
-	private ModelLoader cube;
 	
 	SimulatorRenderer(Context context) {
 		this.context = context;
-		cube = new ModelLoader(context, R.raw.mybox);
+		ModelLoader cube = new ModelLoader(context, R.raw.f16model);
 		myArray = new GLESArray(cube.getVertexArray());
+		/*
 		float[] a = cube.getVertexArray();
 		System.out.println("Testing");
 		for (int i = 0; i < a.length; i += 3) {
 			System.out.println(a[i] + " " + a[i + 1] + " " + a[i + 2]);
 		}
-		//System.out.println("h");
+		*/
+		//Ste
 		//myAircraft = new F16Aircraft();	
 	}
 	
@@ -62,9 +64,10 @@ public class SimulatorRenderer implements Renderer {
 	@Override
 	public void onDrawFrame(GL10 glUnused) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		rotateM(projMatrix, 0, 1f, 0f, 0.1f, 0f);
-		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
 		
+		rotateM(projMatrix, 0, 1f, 1f, 1f, 0f);
+		
+		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
 		
 		glDrawArrays(GL_TRIANGLES, 0, myArray.getSize() / Constants.NUM_POSITION_COMPONENTS);
 		//myAircraft.draw();
@@ -74,19 +77,19 @@ public class SimulatorRenderer implements Renderer {
 	public void onSurfaceChanged(GL10 glUnused, int width, int height) {
 		glViewport(0, 0, width, height);
 		
-		MatrixHelper.perspecitveM(projMatrix,  90,  (float) width / (float) height, 1f, 10f);
+		MatrixHelper.perspecitveM(projMatrix,  90f,  (float) width / (float) height, 1f, 10f);
+		setIdentityM(modelMatrix, 0);
+		translateM(modelMatrix, 0, 0f, 0f, -4f);
 		
-		setLookAtM(viewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1f, 0f);
-		
-		//setIdentityM(modelMatrix, 0);
-		//translateM(modelMatrix, 0, 0f, 0f, -1f);
+		//setLookAtM(viewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1f, 0f);
 		
 		final float[] temp = new float[16];
-		multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
-		//multiplyMM(projMatrix, 0, temp, 0, modelMatrix, 0);
+				
+		//multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
+		multiplyMM(temp, 0, projMatrix, 0, modelMatrix, 0);
 		System.arraycopy(temp, 0, projMatrix, 0, temp.length);
 		
-		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
+		//glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
 	}
 
 	@Override
