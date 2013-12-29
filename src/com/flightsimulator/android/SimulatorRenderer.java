@@ -55,7 +55,7 @@ public class SimulatorRenderer implements Renderer {
 			System.out.println(a[i] + " " + a[i + 1] + " " + a[i + 2]);
 		}
 		*/
-		//Ste
+		//Stet
 		//myAircraft = new F16Aircraft();	
 	}
 	
@@ -65,7 +65,7 @@ public class SimulatorRenderer implements Renderer {
 	public void onDrawFrame(GL10 glUnused) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		rotateM(projMatrix, 0, 1f, 1f, 1f, 0f);
+		rotateM(projMatrix, 0, 1f, 1f, 0f, 0f);
 		
 		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
 		
@@ -81,13 +81,13 @@ public class SimulatorRenderer implements Renderer {
 		setIdentityM(modelMatrix, 0);
 		translateM(modelMatrix, 0, 0f, 0f, -4f);
 		
-		//setLookAtM(viewMatrix, 0, 0f, 0f, 5f, 0f, 0f, 0f, 0f, 1f, 0f);
+		setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f);
 		
 		final float[] temp = new float[16];
 				
-		//multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
-		multiplyMM(temp, 0, projMatrix, 0, modelMatrix, 0);
-		System.arraycopy(temp, 0, projMatrix, 0, temp.length);
+		multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
+		multiplyMM(projMatrix, 0, temp, 0, modelMatrix, 0);
+		//System.arraycopy(temp, 0, projMatrix, 0, temp.length);
 		
 		//glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
 	}

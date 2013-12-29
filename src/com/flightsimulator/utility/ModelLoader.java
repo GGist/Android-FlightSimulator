@@ -27,6 +27,8 @@ public class ModelLoader {
 			Log.e(TAG, "Error parsing OBJ file: " + contents.substring(0, startIndex));
 		}
 		
+		System.out.println("Vertice Count: " + vertIndices.get(vertIndices.size() - 1));
+		
 		vertIndices.trimToSize();
 		uvIndices.trimToSize();
 		normIndices.trimToSize();
@@ -56,7 +58,15 @@ public class ModelLoader {
 		}
 		*/
 	}
+	/*
+	public static boolean genVertexFile() {
+		
+	}
 	
+	public static boolean genIndexFile() {
+		
+	}
+	*/
 	public float[] getVertexArray() {
 		float[] vertices = new float[vertIndices.size() * POSITION_COMPONENTS];
 		Vec3<Float> temp;
@@ -69,7 +79,7 @@ public class ModelLoader {
 			vertices[i + 2] = temp.z;
 			++index;
 		}
-		
+		System.out.println("TT " + vertIndices.size() * POSITION_COMPONENTS);
 		return vertices;
 	}
 	
