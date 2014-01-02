@@ -23,9 +23,8 @@ public class ModelLoader {
 		contents = TextLoader.getTextFromFile(context, fileId) + " ";
 		int startIndex = 0;
 
-		if (!parseFile(startIndex) && LoggerStatus.ON) {
+		if (!parseFile(startIndex) && LoggerStatus.ON)
 			Log.e(TAG, "Error parsing OBJ file: " + contents.substring(0, startIndex));
-		}
 		
 		System.out.println("Vertice Count: " + vertIndices.get(vertIndices.size() - 1));
 		

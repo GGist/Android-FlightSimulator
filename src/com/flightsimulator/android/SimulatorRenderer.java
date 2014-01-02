@@ -1,22 +1,21 @@
 package com.flightsimulator.android;
 
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
+import static android.opengl.GLES20.GL_DEPTH_TEST;
 import static android.opengl.GLES20.GL_TRIANGLES;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glDrawArrays;
+import static android.opengl.GLES20.glEnable;
 import static android.opengl.GLES20.glUniform4f;
 import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glViewport;
-import static android.opengl.GLES20.glEnable;
-import static android.opengl.GLES20.glDisable;
-import static android.opengl.GLES20.GL_DEPTH_TEST;
-import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
-import static android.opengl.Matrix.setIdentityM;
-import static android.opengl.Matrix.translateM;
-import static android.opengl.Matrix.rotateM;
 import static android.opengl.Matrix.multiplyMM;
+import static android.opengl.Matrix.rotateM;
+import static android.opengl.Matrix.setIdentityM;
 import static android.opengl.Matrix.setLookAtM;
+import static android.opengl.Matrix.translateM;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -26,7 +25,8 @@ import android.opengl.GLSurfaceView.Renderer;
 
 import com.flightsimulator.R;
 import com.flightsimulator.aircraft.F16Aircraft;
-import com.flightsimulator.container.GLESArray;
+import com.flightsimulator.container.GLArray;
+import com.flightsimulator.container.GLVertexArray;
 import com.flightsimulator.shaders.ColorShader;
 import com.flightsimulator.utility.MatrixHelper;
 import com.flightsimulator.utility.ModelLoader;
@@ -42,21 +42,12 @@ public class SimulatorRenderer implements Renderer {
 	private final float[] modelMatrix = new float[16];
 	F16Aircraft myAircraft;
 	
-	private GLESArray myArray;
+	private GLVertexArray myArray;
 	
 	SimulatorRenderer(Context context) {
 		this.context = context;
 		ModelLoader cube = new ModelLoader(context, R.raw.f16model);
-		myArray = new GLESArray(cube.getVertexArray());
-		/*
-		float[] a = cube.getVertexArray();
-		System.out.println("Testing");
-		for (int i = 0; i < a.length; i += 3) {
-			System.out.println(a[i] + " " + a[i + 1] + " " + a[i + 2]);
-		}
-		*/
-		//Stet
-		//myAircraft = new F16Aircraft();	
+		myArray = new GLVertexArray(new GLArray(cube.getVertexArray()));
 	}
 	
 	//Starting Order: onSurfaceCreated -> onSurfaceChanged -> onDrawFrame -> ...
@@ -99,7 +90,7 @@ public class SimulatorRenderer implements Renderer {
 		program = new ColorShader(context, R.raw.vertex_shader, R.raw.fragment_shader);
 		program.setProgramActive();
 		
-		myArray.setVertexAttribPtr(0, program.getPositionAttribLocation(), 3, 0);
+		myArray.setVertexAttribPointer(0, program.getPositionAttribLocation(), 3, 0);
 		
 		//Sets the color for the current draw call. Needs to change if switching between shaders.
 		uColorLocation = program.getColorUniformLocation();

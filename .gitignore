@@ -1,0 +1,11 @@
+# Ignore anything that is not a folder in root directory
+/*.*
+
+# Ignore the following folders
+/bin
+/gen
+
+# Don't ignore the following in root directory
+!AndroidManifest.xml
+!README.md
+!.gitignore

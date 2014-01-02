@@ -3,7 +3,8 @@ package com.flightsimulator.aircraft;
 import static android.opengl.GLES20.GL_POINTS;
 import static android.opengl.GLES20.glDrawArrays;
 
-import com.flightsimulator.container.GLESArray;
+import com.flightsimulator.container.GLArray;
+import com.flightsimulator.container.GLVertexArray;
 import com.flightsimulator.shaders.ColorShader;
 
 public class F16Aircraft extends Aircraft<F16Aircraft> {
@@ -12,17 +13,17 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 	private int vertexOffset = 0;
 	private AircraftData myData;
 	private AttachmentData assembleInfo;
-	private GLESArray vertexData;
+	private GLVertexArray vertexData;
 	
 	public F16Aircraft() {
 		assembleInfo = new AttachmentData();
 		myData = createFuselage(3)
 				.build();
-		vertexData = new GLESArray(myData.vertexData);
+		vertexData = new GLVertexArray(new GLArray(myData.vertexData));
 	}
 	
     public void bindData(ColorShader colorShader) {
-        vertexData.setVertexAttribPtr(0,
+        vertexData.setVertexAttribPointer(0,
         colorShader.getPositionAttribLocation(),
         NUM_POSITION_COMPONENTS, 0);
     }
