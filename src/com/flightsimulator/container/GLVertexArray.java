@@ -2,7 +2,6 @@ package com.flightsimulator.container;
 
 import static android.opengl.GLES20.GL_BYTE;
 import static android.opengl.GLES20.GL_FLOAT;
-import static android.opengl.GLES20.GL_INT;
 import static android.opengl.GLES20.GL_SHORT;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glVertexAttribPointer;

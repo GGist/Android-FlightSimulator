@@ -40,6 +40,7 @@ public class SimulatorActivity extends Activity {
 		setContentView(mySurfaceView);
 	}
 	
+	@Override
 	protected void onPause() {
 		super.onPause();
 		if (rendererSet) {
@@ -47,6 +48,7 @@ public class SimulatorActivity extends Activity {
 		}
 	}
 	
+	@Override
 	protected void onResume() {
 		super.onResume();
 		if (rendererSet) {

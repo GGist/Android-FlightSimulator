@@ -9,6 +9,11 @@ public class Vec {
 			x = null;
 			y = null;
 		}
+		
+		public Vec2(Type x, Type y) {
+			this.x = x;
+			this.y = y;
+		}
 	}
 	
 	public static class Vec3<Type> {
@@ -20,6 +25,12 @@ public class Vec {
 			x = null;
 			y = null;
 			z = null;
+		}
+		
+		public Vec3(Type x, Type y, Type z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
 		}
 	}
 }

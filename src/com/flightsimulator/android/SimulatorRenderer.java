@@ -17,6 +17,11 @@ import static android.opengl.Matrix.setIdentityM;
 import static android.opengl.Matrix.setLookAtM;
 import static android.opengl.Matrix.translateM;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -30,6 +35,7 @@ import com.flightsimulator.container.GLVertexArray;
 import com.flightsimulator.shaders.ColorShader;
 import com.flightsimulator.utility.MatrixHelper;
 import com.flightsimulator.utility.ModelLoader;
+import com.flightsimulator.world.TerrainGenerator;
 
 public class SimulatorRenderer implements Renderer {
 	private static final String TAG = "SimulatorRenderer";
@@ -40,14 +46,22 @@ public class SimulatorRenderer implements Renderer {
 	private final float[] projMatrix = new float[16];
 	private final float[] viewMatrix = new float[16];
 	private final float[] modelMatrix = new float[16];
+	private final float[][] terrain;
 	F16Aircraft myAircraft;
 	
 	private GLVertexArray myArray;
 	
 	SimulatorRenderer(Context context) {
 		this.context = context;
-		ModelLoader cube = new ModelLoader(context, R.raw.f16model);
-		myArray = new GLVertexArray(new GLArray(cube.getVertexArray()));
+		//ModelLoader cube = new ModelLoader(context, R.raw.f16model);
+		//myArray = new GLVertexArray(new GLArray(cube.getVertexArray()));
+		terrain = TerrainGenerator.genTerrainDS(16, 2, 100, -100);
+
+		for (int i = 0; i < terrain.length; ++i) {
+			for (int j = 0; j < terrain[i].length; ++j) {
+				System.out.println("Array Index: " + i + " " + j + " Array Data: " + terrain[i][j]);
+			}
+		}
 	}
 	
 	//Starting Order: onSurfaceCreated -> onSurfaceChanged -> onDrawFrame -> ...
@@ -60,7 +74,7 @@ public class SimulatorRenderer implements Renderer {
 		
 		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
 		
-		glDrawArrays(GL_TRIANGLES, 0, myArray.getSize() / Constants.NUM_POSITION_COMPONENTS);
+		//glDrawArrays(GL_TRIANGLES, 0, myArray.getSize() / Constants.NUM_POSITION_COMPONENTS);
 		//myAircraft.draw();
 	}
 
@@ -90,7 +104,7 @@ public class SimulatorRenderer implements Renderer {
 		program = new ColorShader(context, R.raw.vertex_shader, R.raw.fragment_shader);
 		program.setProgramActive();
 		
-		myArray.setVertexAttribPointer(0, program.getPositionAttribLocation(), 3, 0);
+		//myArray.setVertexAttribPointer(0, program.getPositionAttribLocation(), 3, 0);
 		
 		//Sets the color for the current draw call. Needs to change if switching between shaders.
 		uColorLocation = program.getColorUniformLocation();
