@@ -24,7 +24,8 @@ public class GLArray {
 	public GLArray(byte[] array) {
 		size = array.length;
 		data = allocateMemory(size, Constants.BYTES_PER_SHORT)
-				.put(array);
+				.put(array)
+				.position(0);
 		bufferType = BufferType.BYTE;
 	}
 	
@@ -32,7 +33,8 @@ public class GLArray {
 		size = array.length;
 		data = allocateMemory(size, Constants.BYTES_PER_SHORT)
 				.asShortBuffer()
-				.put(array);
+				.put(array)
+				.position(0);
 		bufferType = BufferType.SHORT;
 	}
 	
@@ -40,7 +42,8 @@ public class GLArray {
 		size = array.length;
 		data = allocateMemory(size, Constants.BYTES_PER_FLOAT)
 				.asFloatBuffer()
-				.put(array);
+				.put(array)
+				.position(0);
 		bufferType = BufferType.FLOAT;
 	}
 	

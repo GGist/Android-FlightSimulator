@@ -13,28 +13,25 @@ import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glViewport;
 import static android.opengl.Matrix.multiplyMM;
 import static android.opengl.Matrix.rotateM;
+import static android.opengl.Matrix.scaleM;
 import static android.opengl.Matrix.setIdentityM;
 import static android.opengl.Matrix.setLookAtM;
 import static android.opengl.Matrix.translateM;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView.Renderer;
 
 import com.flightsimulator.R;
 import com.flightsimulator.aircraft.F16Aircraft;
 import com.flightsimulator.container.GLArray;
 import com.flightsimulator.container.GLVertexArray;
+import com.flightsimulator.container.GLVertexBuffer;
 import com.flightsimulator.shaders.ColorShader;
 import com.flightsimulator.utility.MatrixHelper;
-import com.flightsimulator.utility.ModelLoader;
 import com.flightsimulator.world.TerrainGenerator;
 
 public class SimulatorRenderer implements Renderer {
@@ -47,33 +44,90 @@ public class SimulatorRenderer implements Renderer {
 	private final float[] viewMatrix = new float[16];
 	private final float[] modelMatrix = new float[16];
 	private final float[][] terrain;
+	private final float[] coordArray;
 	F16Aircraft myAircraft;
+	
+	private float xRotation, yRotation;
 	
 	private GLVertexArray myArray;
 	
+	private GLVertexBuffer myBuffer;
+	private int size;
+	//
 	SimulatorRenderer(Context context) {
 		this.context = context;
 		//ModelLoader cube = new ModelLoader(context, R.raw.f16model);
 		//myArray = new GLVertexArray(new GLArray(cube.getVertexArray()));
-		terrain = TerrainGenerator.genTerrainDS(16, 2, 100, -100);
-
-		for (int i = 0; i < terrain.length; ++i) {
-			for (int j = 0; j < terrain[i].length; ++j) {
-				System.out.println("Array Index: " + i + " " + j + " Array Data: " + terrain[i][j]);
+//
+		terrain = TerrainGenerator.genTerrainDS(64, 0.1f, 0, 20);
+		size = (terrain.length - 1) * (terrain.length - 1) * 2 * 3 * 3;
+		coordArray = new float[size];
+		int counter = 0;
+		final int factor = 1;
+		for (int i = 1; i < terrain.length; ++i) {
+			for (int j = 0; j < terrain[i].length - 1; ++j) {
+				//First Triangle
+				coordArray[counter++] = j / factor;
+				coordArray[counter++] = terrain[i][j];
+				coordArray[counter++] = -(i / factor);
+				
+				coordArray[counter++] = (j + 1) / factor;
+				coordArray[counter++] = terrain[i][j + 1];
+				coordArray[counter++] = -(i / factor);
+				
+				coordArray[counter++] = j / factor;
+				coordArray[counter++] = terrain[i - 1][j];
+				coordArray[counter++] = -((i - 1) / factor);
+				//Second Triangle
+				coordArray[counter++] = (j + 1) / factor;
+				coordArray[counter++] = terrain[i - 1][j + 1];
+				coordArray[counter++] = -((i - 1) / factor);
+				
+				coordArray[counter++] = (j + 1) / factor;
+				coordArray[counter++] = terrain[i][j + 1];
+				coordArray[counter++] = -(i / factor);
+				
+				coordArray[counter++] = j / factor;
+				coordArray[counter++] = terrain[i - 1][j];
+				coordArray[counter++] = -((i - 1) / factor);
 			}
+			
 		}
 	}
 	
-	//Starting Order: onSurfaceCreated -> onSurfaceChanged -> onDrawFrame -> ...
+	public void handleTouchDrag(float deltaX, float deltaY) {
+        xRotation += deltaX / 16f;
+        yRotation += deltaY / 16f;
+        
+        if (yRotation < -90) {
+            yRotation = -90;
+        } else if (yRotation > 90) {
+            yRotation = 90;
+        }       
+    }
 	
+	//Starting Order: onSurfaceCreated -> onSurfaceChanged -> onDrawFrame -> ...
+	//
 	@Override
 	public void onDrawFrame(GL10 glUnused) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		rotateM(projMatrix, 0, 1f, 1f, 0f, 0f);
+		setLookAtM(viewMatrix, 0, 10f, 5f, 0f, 0f, 0f, 0f, 0f, 1f, 0f);
+		rotateM(viewMatrix, 0, -yRotation, 1f, 0f, 0f);
+        rotateM(viewMatrix, 0, -xRotation, 0f, 1f, 0f);
 		
-		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
+		final float[] temp = new float[16];
+				
+		multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
+		multiplyMM(viewMatrix, 0, temp, 0, modelMatrix, 0);
 		
+		//rotateM(projMatrix, 0, 1f, 1f, 0f, 0f);
+		
+		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, viewMatrix, 0);
+		
+		
+		myBuffer.setVertexAttribPointer(0, program.getPositionAttribLocation(), 3, 0);
+		glDrawArrays(GL_TRIANGLES, 0, size / 3);
 		//glDrawArrays(GL_TRIANGLES, 0, myArray.getSize() / Constants.NUM_POSITION_COMPONENTS);
 		//myAircraft.draw();
 	}
@@ -82,16 +136,14 @@ public class SimulatorRenderer implements Renderer {
 	public void onSurfaceChanged(GL10 glUnused, int width, int height) {
 		glViewport(0, 0, width, height);
 		
-		MatrixHelper.perspecitveM(projMatrix,  90f,  (float) width / (float) height, 1f, 10f);
+		MatrixHelper.perspecitveM(projMatrix,  90f,  (float) width / (float) height, 1f, 1000f);
+		scaleM(projMatrix, 0, 0.5f, 0.5f, 0.5f);
+		
 		setIdentityM(modelMatrix, 0);
-		translateM(modelMatrix, 0, 0f, 0f, -4f);
 		
-		setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f);
+		//translateM(modelMatrix, 0, 0f, -4f, -3f);
 		
-		final float[] temp = new float[16];
-				
-		multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
-		multiplyMM(projMatrix, 0, temp, 0, modelMatrix, 0);
+		setLookAtM(viewMatrix, 0, 0f, 0f, 2f, 0f, 0f, 0f, 0f, 1f, 0f);
 		//System.arraycopy(temp, 0, projMatrix, 0, temp.length);
 		
 		//glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
@@ -111,6 +163,8 @@ public class SimulatorRenderer implements Renderer {
 		glUniform4f(uColorLocation, 0.0f, 1.0f, 1.0f, 0.0f);
 		
 		glEnable(GL_DEPTH_TEST);
+		
+		myBuffer = new GLVertexBuffer(new GLArray(coordArray));
 		
 		//Sets the positions for the current draw call. Needs to change if switching between shaders.
 		//myAircraft.bindData(program);

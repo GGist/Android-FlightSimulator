@@ -26,7 +26,7 @@ public class GLVertexBuffer {
 	
 	private int genVertexBuffer(GLArray array) {
 		//Allocate vertex buffer
-		final int buffer[] = new int[1];
+		final int buffer[] = new int[2];
         glGenBuffers(buffer.length, buffer, 0);
         if (buffer[0] == 0)
             throw new RuntimeException("Could not create a new vertex buffer object.");

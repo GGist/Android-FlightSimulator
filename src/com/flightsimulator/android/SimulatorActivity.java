@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.Toast;
 
 public class SimulatorActivity extends Activity {
@@ -36,6 +39,38 @@ public class SimulatorActivity extends Activity {
 				Toast.LENGTH_LONG).show();
 	        return;
 		}
+		
+        mySurfaceView.setOnTouchListener(new OnTouchListener() {
+            float previousX, previousY;
+            
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event != null) {                                                                           
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        previousX = event.getX();
+                        previousY = event.getY();
+                    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        final float deltaX = event.getX() - previousX;
+                        final float deltaY = event.getY() - previousY;
+                        
+                        previousX = event.getX();
+                        previousY = event.getY();
+                        
+                        mySurfaceView.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                myRenderer.handleTouchDrag(
+                                    deltaX, deltaY);
+                            }
+                        });
+                    }                                        
+
+                    return true;                    
+                } else {
+                    return false;
+                }
+            }
+        });
 		
 		setContentView(mySurfaceView);
 	}

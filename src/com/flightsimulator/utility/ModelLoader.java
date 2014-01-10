@@ -78,7 +78,7 @@ public class ModelLoader {
 			vertices[i + 2] = temp.z;
 			++index;
 		}
-		System.out.println("TT " + vertIndices.size() * POSITION_COMPONENTS);
+
 		return vertices;
 	}
 	

@@ -8,9 +8,9 @@ public class TerrainGenerator {
 	public static final String TAG = "TerrainGenerator";
 	
 	private static final Random rand = new Random();
-	
+
 	//http://www.gameprogrammer.com/fractal.html#diamond
-	public static float[][] genTerrainDS(final int dim, final int smoothFactor, float maxHeight, float minHeight) {
+	public static float[][] genTerrainDS(final int dim, final float smoothFactor, float minHeight, float maxHeight) {
 		float[][] terrainData = new float[dim + 1][dim + 1];
 		//Range (maxHeight - minHeight) will be reduced by 2^(-smoothFactor) after each pass
 		final double H = 1 / Math.pow(2, smoothFactor);
@@ -19,8 +19,8 @@ public class TerrainGenerator {
 		final int numPasses = (int) (Math.log(dim * dim) / Math.log(4));
 		
 		//Seed corners
-		terrainData[0][0] = terrainData[0][dim] = terrainData[dim][0] = terrainData[dim][dim] = rand.nextFloat() * (maxHeight - minHeight) + minHeight;
-		
+		terrainData[0][0] = terrainData[0][dim] = terrainData[dim][0] = terrainData[dim][dim] = maxHeight / 2;//rand.nextFloat() * (maxHeight - minHeight) + minHeight;
+
 		//Diamond-Square Iterations
 		for (int i = 0; i < numPasses; ++i) {
 			//Diamond Step First Pass: 1 Second Pass: 4 Third Pass: 16 Fourth Pass: 64
@@ -38,7 +38,14 @@ public class TerrainGenerator {
 		    	average /= 4;
 		    	average += rand.nextFloat() * (maxHeight - minHeight) + minHeight;
 
+		    	//Clamp Value
+		    	if (average > maxHeight)
+		    		average = maxHeight;
+		    	else if (average < minHeight)
+		    		average = minHeight;
+
 		    	terrainData[sCoord.x + (subSquareDim / 2)][sCoord.y + (subSquareDim / 2)] = average;
+		    	
 		    }
 		    
 			//Square Step First Pass: 2 Second Pass: 8 Third Pass: 32 Fourth Pass: 128
@@ -56,10 +63,16 @@ public class TerrainGenerator {
 		    	average /= 4;
 		    	average += rand.nextFloat() * (maxHeight - minHeight) + minHeight;
 		    	
+		    	//Clamp Value
+		    	if (average > maxHeight)
+		    		average = maxHeight;
+		    	else if (average < minHeight)
+		    		average = minHeight;
+		    	
 		    	terrainData[dCoord.x][dCoord.y] = average;
 		    	mirrorEdgeData(terrainData, dim, average, dCoord.x, dCoord.y);
 		    }
-		    
+
 		    //Reduce Range
 		    float midHeight = (maxHeight + minHeight) / 2;
 		    minHeight = (float) (midHeight - ((midHeight - minHeight) * H));
