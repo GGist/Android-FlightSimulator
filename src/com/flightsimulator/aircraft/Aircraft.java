@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import com.flightsimulator.container.FloatArray;
-
 public abstract class Aircraft<T> {
 	//Data Storage Objects
 	
@@ -57,27 +55,27 @@ public abstract class Aircraft<T> {
 	}
 	
 	//Class Body
-	private FloatArray vertexData = null;
+	//private FloatArray vertexData = null;
 	private List<DrawMethod> drawCalls = null;
 	
-	public AircraftData build() {
-		FloatArray vData = vertexData;
-		List<DrawMethod> dCalls = drawCalls;
+	//public AircraftData build() {
+		//FloatArray vData = vertexData;
+		//List<DrawMethod> dCalls = drawCalls;
 		
 		//Allocate new data storage if appending->building again
-		vertexData = null;
-		drawCalls = null;
+		//vertexData = null;
+		//drawCalls = null;
 		
-		return new AircraftData(vData.asArray(), dCalls);
-	}
+		//return new AircraftData(vData.asArray(), dCalls);
+	//}
 	
 	public void appendData(float[] vData, DrawMethod dCall) {
-		if (vertexData == null)
-			vertexData = new FloatArray();
+		//if (vertexData == null)
+			//vertexData = new FloatArray();
 		if (drawCalls == null)
 			drawCalls = new ArrayList<DrawMethod>();
 		
-		vertexData.appendArray(vData);
+		//vertexData.appendArray(vData);
 		drawCalls.add(dCall);
 	}
 	

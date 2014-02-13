@@ -13,10 +13,11 @@ import com.flightsimulator.utility.LoggerStatus;
 public class GLIndexBuffer {
 	private static final String TAG = "GLIndexBuffer";
 	
-	private final int bufferId;
+	private final int bufferId, numIndices;
 	
 	public GLIndexBuffer(GLArray array) {
 		bufferId = genIndexBuffer(array);
+		numIndices = array.getSize();
 	}
 	
 	private int genIndexBuffer(GLArray array) {
@@ -47,4 +48,8 @@ public class GLIndexBuffer {
 	public int getBufferId() {
         return bufferId;
     }
+	
+	public int getNumIndices() {
+		return numIndices;
+	}
 }

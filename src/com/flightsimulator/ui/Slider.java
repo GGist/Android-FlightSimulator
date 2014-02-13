@@ -2,9 +2,9 @@ package com.flightsimulator.ui;
 
 import com.flightsimulator.shaders.TextureShader;
 
-public class Button extends Control {
+public class Slider extends Control {
 
-	public Button(Task task, Controllable object) {
+	public Slider(Task task, Controllable object) {
 		super(task, object);
 		// TODO Auto-generated constructor stub
 	}

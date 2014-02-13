@@ -1,113 +1,146 @@
 package com.flightsimulator.android;
 
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
+import static android.opengl.GLES20.GL_DEPTH_TEST;
+import static android.opengl.GLES20.GL_LEQUAL;
 import static android.opengl.GLES20.GL_TRIANGLES;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
+import static android.opengl.GLES20.glDepthFunc;
 import static android.opengl.GLES20.glDrawArrays;
-import static android.opengl.GLES20.glUniform4f;
-import static android.opengl.GLES20.glUniformMatrix4fv;
-import static android.opengl.GLES20.glViewport;
 import static android.opengl.GLES20.glEnable;
-import static android.opengl.GLES20.glDisable;
-import static android.opengl.GLES20.GL_DEPTH_TEST;
-import static android.opengl.GLES20.GL_DEPTH_BUFFER_BIT;
-import static android.opengl.Matrix.setIdentityM;
-import static android.opengl.Matrix.translateM;
-import static android.opengl.Matrix.rotateM;
-import static android.opengl.Matrix.multiplyMM;
-import static android.opengl.Matrix.setLookAtM;
+import static android.opengl.GLES20.glUniform4f;
+import static android.opengl.GLES20.glViewport;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView.Renderer;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.MotionEvent;
 
 import com.flightsimulator.R;
-import com.flightsimulator.aircraft.F16Aircraft;
-import com.flightsimulator.container.GLESArray;
+import com.flightsimulator.container.GLArray;
+import com.flightsimulator.container.GLVertexBuffer;
+import com.flightsimulator.container.Vec.Vec2;
 import com.flightsimulator.shaders.ColorShader;
-import com.flightsimulator.utility.MatrixHelper;
+import com.flightsimulator.shaders.TextureShader;
+import com.flightsimulator.ui.Control;
+import com.flightsimulator.ui.Joystick;
+import com.flightsimulator.ui.SimulatorUI;
+import com.flightsimulator.ui.Task;
+import com.flightsimulator.utility.BasicGeometry.Circle;
+import com.flightsimulator.utility.BasicGeometry.Point;
+import com.flightsimulator.utility.LoggerStatus;
 import com.flightsimulator.utility.ModelLoader;
+import com.flightsimulator.utility.TextureHelper;
 
 public class SimulatorRenderer implements Renderer {
 	private static final String TAG = "SimulatorRenderer";
 	private final Context context;
 	
-	private ColorShader program;
-	private int uColorLocation;
-	private final float[] projMatrix = new float[16];
-	private final float[] viewMatrix = new float[16];
-	private final float[] modelMatrix = new float[16];
-	F16Aircraft myAircraft;
+	private ColorShader colorProgram;
+	private TextureShader textureProgram;
+
+	private GLVertexBuffer model;
 	
-	private GLESArray myArray;
+	private SimulatorUI myUI;
+	private Camera camera;
+	
+	//FPS
+    private long startTime, totalTime;
+    private int counter;
 	
 	SimulatorRenderer(Context context) {
 		this.context = context;
-		ModelLoader cube = new ModelLoader(context, R.raw.f16model);
-		myArray = new GLESArray(cube.getVertexArray());
-		/*
-		float[] a = cube.getVertexArray();
-		System.out.println("Testing");
-		for (int i = 0; i < a.length; i += 3) {
-			System.out.println(a[i] + " " + a[i + 1] + " " + a[i + 2]);
-		}
-		*/
-		//Stet
-		//myAircraft = new F16Aircraft();	
 	}
 	
-	//Starting Order: onSurfaceCreated -> onSurfaceChanged -> onDrawFrame -> ...
+	//Do not bleed over too much android specific code
+	public void handleTouch(int maskedAction, int touchId, float x, float y) {
+		
+		switch (maskedAction)
+		{
+		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_POINTER_DOWN:
+			myUI.reportClick(touchId, x, y);
+			break;
+		case MotionEvent.ACTION_MOVE:
+			myUI.reportDrag(touchId, x, y);
+			break;
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_POINTER_UP:
+		case MotionEvent.ACTION_CANCEL:
+			myUI.reportRelease(touchId, x, y);
+			break;
+			default:
+				if (LoggerStatus.ON)
+					Log.v(TAG, "A maskedAction Id was not handled in handleTouch()");
+		}
+	}
+	
+	//Starting Order: onSurfaceCreated -> onSurfaceChanged -> onDrawFrame -> ... Android can delete
+	//GL context if it needs space, onSucfaceCreated could be called more than once during app lifecycle
 	
 	@Override
 	public void onDrawFrame(GL10 glUnused) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		rotateM(projMatrix, 0, 1f, 1f, 0f, 0f);
+		myUI.draw(textureProgram);
 		
-		glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
+		colorProgram.setProgramActive();
+		colorProgram.setUniform(camera.getMatrix());
+		glUniform4f(colorProgram.getColorUniformLocation(), 0.0f, 1.0f, 1.0f, 0.0f);
+		model.setVertexAttribPointer(0, colorProgram.getPositionAttribLocation(), Constants.NUM_POSITION_COMPONENTS, 0);
+		glDrawArrays(GL_TRIANGLES, 0, model.getSize() / Constants.NUM_POSITION_COMPONENTS);
 		
-		glDrawArrays(GL_TRIANGLES, 0, myArray.getSize() / Constants.NUM_POSITION_COMPONENTS);
-		//myAircraft.draw();
+		if (LoggerStatus.ON)
+			fps();
 	}
 
 	@Override
 	public void onSurfaceChanged(GL10 glUnused, int width, int height) {
 		glViewport(0, 0, width, height);
 		
-		MatrixHelper.perspecitveM(projMatrix,  90f,  (float) width / (float) height, 1f, 10f);
-		setIdentityM(modelMatrix, 0);
-		translateM(modelMatrix, 0, 0f, 0f, -4f);
-		
-		setLookAtM(viewMatrix, 0, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f);
-		
-		final float[] temp = new float[16];
-				
-		multiplyMM(temp, 0, projMatrix, 0, viewMatrix, 0);
-		multiplyMM(projMatrix, 0, temp, 0, modelMatrix, 0);
-		//System.arraycopy(temp, 0, projMatrix, 0, temp.length);
-		
-		//glUniformMatrix4fv(program.getMatrixUniformLocation(), 1, false, projMatrix, 0);
+		myUI.reportScreenRotate();
 	}
 
 	@Override
 	public void onSurfaceCreated(GL10 glUnused, EGLConfig config) {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-		program = new ColorShader(context, R.raw.vertex_shader, R.raw.fragment_shader);
-		program.setProgramActive();
-		
-		myArray.setVertexAttribPtr(0, program.getPositionAttribLocation(), 3, 0);
-		
-		//Sets the color for the current draw call. Needs to change if switching between shaders.
-		uColorLocation = program.getColorUniformLocation();
-		glUniform4f(uColorLocation, 0.0f, 1.0f, 1.0f, 0.0f);
-		
 		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
 		
-		//Sets the positions for the current draw call. Needs to change if switching between shaders.
-		//myAircraft.bindData(program);
+		ModelLoader myLoader = new ModelLoader(context, R.raw.f16model);
+		model = new GLVertexBuffer(new GLArray(myLoader.getVertexArray()));
+		
+		DisplayMetrics screen = context.getResources().getDisplayMetrics();
+		
+		camera = new Camera(screen.widthPixels, screen.heightPixels);
+		Joystick myJoystick = new Joystick(Task.MOVEMENT_CARDINAL, camera, new Circle(new Point(-1.2f, -0.6f, 0f), 0.2f), TextureHelper.loadTexture(context, R.drawable.flatdark06), TextureHelper.loadTexture(context, R.drawable.flatdark00));
+		Joystick aJoystick = new Joystick(Task.MOVEMENT_HEIGHT, camera, new Circle(new Point(1.2f, -0.6f, 0f), 0.2f), TextureHelper.loadTexture(context, R.drawable.flatdark06), TextureHelper.loadTexture(context, R.drawable.flatdark00));
+		
+		Control[] controls = new Control[2];
+		controls[0] = myJoystick;
+		controls[1] = aJoystick;
+		myUI = new SimulatorUI(new Vec2<Integer>(screen.widthPixels, screen.heightPixels), controls);
+		myUI.reportScreenRotate();
+		
+		colorProgram = new ColorShader(context, R.raw.vertex_shader, R.raw.fragment_shader);
+		textureProgram = new TextureShader(context, R.raw.texture_vertex_shader, R.raw.texture_fragment_shader);
+	}
+	
+	private void fps() {
+		totalTime += System.nanoTime() - startTime;
+        startTime = System.nanoTime();
+        ++counter;
+        if ((float)totalTime / 1000000000 > 1) {
+            System.out.println("FPS: " + counter);
+            startTime = System.nanoTime();
+            totalTime = 0;
+            counter = 0;
+        }
 	}
 }

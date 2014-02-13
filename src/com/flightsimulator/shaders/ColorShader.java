@@ -2,6 +2,7 @@ package com.flightsimulator.shaders;
 
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;
+import static android.opengl.GLES20.glUniformMatrix4fv;
 import android.content.Context;
 
 public class ColorShader extends Shader {
@@ -22,8 +23,8 @@ public class ColorShader extends Shader {
 		aPositionLocation = glGetAttribLocation(program, "a_Position");
 	}
 	
-	public int getMatrixUniformLocation() {
-		return uMatrixLocation;
+	public void setUniform(float[] matrix) {
+		glUniformMatrix4fv(uMatrixLocation, 1, false, matrix, 0);
 	}
 	
 	public int getPositionAttribLocation() {

@@ -16,12 +16,13 @@ import com.flightsimulator.container.GLArray.BufferType;
 public class GLVertexBuffer {
 	private static final String TAG = "GLVertexBuffer";
 	
-	private int bufferId;
+	private int bufferId, numVertices;
 	private BufferType bufferType;
 	
 	public GLVertexBuffer(GLArray array) {
 		bufferId = genVertexBuffer(array);
 		bufferType = array.getBufferType();
+		numVertices = array.getSize();
 	}
 	
 	private int genVertexBuffer(GLArray array) {
@@ -44,7 +45,7 @@ public class GLVertexBuffer {
         
         return buffer[0];
 	}
-	
+	//
 	public void setVertexAttribPointer(int dataOffset, int attribLocation,
 			int numComponents, int stride) {
 		glBindBuffer(GL_ARRAY_BUFFER, bufferId);
@@ -66,5 +67,9 @@ public class GLVertexBuffer {
 		
 		glEnableVertexAttribArray(attribLocation);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+	
+	public int getSize() {
+		return numVertices;
 	}
 }

@@ -10,6 +10,11 @@ public class Vec {
 			y = null;
 		}
 		
+		public Vec2(Vec2<Type> vec) {
+			x = vec.x;
+			y = vec.y;
+		}
+		
 		public Vec2(Type x, Type y) {
 			this.x = x;
 			this.y = y;
@@ -25,6 +30,12 @@ public class Vec {
 			x = null;
 			y = null;
 			z = null;
+		}
+		
+		public Vec3(Vec3<Type> vec) {
+			x = vec.x;
+			y = vec.y;
+			z = vec.z;
 		}
 		
 		public Vec3(Type x, Type y, Type z) {
