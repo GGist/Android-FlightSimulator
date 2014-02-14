@@ -10,6 +10,14 @@ public class Vec {
 			y = null;
 		}
 		
+<<<<<<< HEAD
+=======
+		public Vec2(Vec2<Type> vec) {
+			x = vec.x;
+			y = vec.y;
+		}
+		
+>>>>>>> master
 		public Vec2(Type x, Type y) {
 			this.x = x;
 			this.y = y;
@@ -27,6 +35,15 @@ public class Vec {
 			z = null;
 		}
 		
+<<<<<<< HEAD
+=======
+		public Vec3(Vec3<Type> vec) {
+			x = vec.x;
+			y = vec.y;
+			z = vec.z;
+		}
+		
+>>>>>>> master
 		public Vec3(Type x, Type y, Type z) {
 			this.x = x;
 			this.y = y;

@@ -3,16 +3,21 @@ package com.flightsimulator.aircraft;
 import static android.opengl.GLES20.GL_POINTS;
 import static android.opengl.GLES20.glDrawArrays;
 
+<<<<<<< HEAD
 import com.flightsimulator.container.GLArray;
 import com.flightsimulator.container.GLVertexArray;
+=======
+>>>>>>> master
 import com.flightsimulator.shaders.ColorShader;
+import com.flightsimulator.ui.Controllable;
+import com.flightsimulator.ui.Task;
 
-public class F16Aircraft extends Aircraft<F16Aircraft> {
-	
+public class F16Aircraft extends Aircraft<F16Aircraft> implements Controllable {
 	private final static int NUM_POSITION_COMPONENTS = 3;
 	private int vertexOffset = 0;
 	private AircraftData myData;
 	private AttachmentData assembleInfo;
+<<<<<<< HEAD
 	private GLVertexArray vertexData;
 	
 	public F16Aircraft() {
@@ -26,6 +31,21 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
         vertexData.setVertexAttribPointer(0,
         colorShader.getPositionAttribLocation(),
         NUM_POSITION_COMPONENTS, 0);
+=======
+	//private GLESArray vertexData;
+	
+	public F16Aircraft() {
+		assembleInfo = new AttachmentData();
+		//myData = createFuselage(3)
+				//.build();
+		//vertexData = new GLESArray(myData.vertexData);
+	}
+	
+    public void bindData(ColorShader colorShader) {
+        //vertexData.setVertexAttribPtr(0,
+        //colorShader.getPositionAttribLocation(),
+       // NUM_POSITION_COMPONENTS, 0);
+>>>>>>> master
     }
 	
 	public void draw() {
@@ -126,5 +146,22 @@ public class F16Aircraft extends Aircraft<F16Aircraft> {
 	public F16Aircraft appendExhaust(int numPoints) {
 
 		return this;
+	}
+
+	@Override
+	public void handleJoystick(Task task, float horiz, float vert) {
+		// TODO Auto-generated method stub
+	} 
+
+	@Override
+	public void handleButton(Task task, boolean on) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleSlider(Task task, float sliderPos) {
+		// TODO Auto-generated method stub
+		
 	}
 }
