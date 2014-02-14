@@ -50,7 +50,6 @@ public class SimulatorUI {
 			
 			return;
 		}
-		//System.out.println(touchId);
 		
 		Vec2<Float> deltaTouch = normAdjustedDelta(touchId, x, y);
 		
@@ -127,7 +126,8 @@ public class SimulatorUI {
 		normCoord.x = x / (viewRes.x / 2) - 1;
 		normCoord.y = -(y / (viewRes.y / 2) - 1);
 		
-		//Inverse Normalized Device Coordinate, expand coordinate on larger axis
+		//Normalized Inverse Device Coordinate, expand coordinate on larger axis
+		//NIDC <- Expand - Normalized Coordinates - Shrink -> NDC
 		if (viewRes.x > viewRes.y)
 			normCoord.x = normCoord.x * (viewRes.x / viewRes.y);
 		else
