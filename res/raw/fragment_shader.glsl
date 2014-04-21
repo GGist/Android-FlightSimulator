@@ -2,9 +2,9 @@ precision mediump float;
 
 uniform vec4 u_Color;
 
-varying vec4 test;
+varying float height;
 
 void main()
 {
-	gl_FragColor = u_Color * test + test;
+	gl_FragColor = vec4(0.0, 255.0 * (height / 25.0), 0.0, 0.0);
 }

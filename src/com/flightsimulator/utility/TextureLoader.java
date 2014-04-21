@@ -16,7 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-public class TextureHelper {
+public class TextureLoader {
 	public static final String TAG = "TextureHelper";
 	
 	public static int loadTexture(Context context, int resourceId) {

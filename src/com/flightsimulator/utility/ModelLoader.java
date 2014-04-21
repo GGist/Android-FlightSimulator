@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.util.Log;
 
-import com.flightsimulator.android.Constants;
 import com.flightsimulator.container.Vec.Vec2;
 import com.flightsimulator.container.Vec.Vec3;
 

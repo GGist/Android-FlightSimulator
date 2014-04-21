@@ -3,9 +3,9 @@ package com.flightsimulator.aircraft;
 import static android.opengl.GLES20.GL_POINTS;
 import static android.opengl.GLES20.glDrawArrays;
 
-import com.flightsimulator.shaders.ColorShader;
-import com.flightsimulator.ui.Controllable;
-import com.flightsimulator.ui.Task;
+import com.flightsimulator.shader.ColorShader;
+import com.flightsimulator.ui.widget.Controllable;
+import com.flightsimulator.ui.widget.Task;
 
 public class F16Aircraft extends Aircraft<F16Aircraft> implements Controllable {
 	private final static int NUM_POSITION_COMPONENTS = 3;

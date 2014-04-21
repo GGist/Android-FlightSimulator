@@ -1,6 +1,6 @@
-package com.flightsimulator.ui;
+package com.flightsimulator.ui.widget;
 
-import com.flightsimulator.shaders.TextureShader;
+import com.flightsimulator.shader.TextureShader;
 
 public abstract class Control {
 	protected final static int NO_TOUCH_ID = -1;

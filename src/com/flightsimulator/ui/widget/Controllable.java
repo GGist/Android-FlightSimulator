@@ -1,4 +1,5 @@
-package com.flightsimulator.ui;
+package com.flightsimulator.ui.widget;
+
 
 public interface Controllable {
 	public void handleJoystick(Task task, float horiz, float vert);

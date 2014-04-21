@@ -1,16 +1,17 @@
-package com.flightsimulator.ui;
+package com.flightsimulator.ui.widget;
 
+import static android.opengl.GLES20.GL_STATIC_DRAW;
 import static android.opengl.GLES20.GL_TRIANGLE_FAN;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.Matrix.multiplyMM;
 import static android.opengl.Matrix.setIdentityM;
 
-import com.flightsimulator.android.Constants;
-import com.flightsimulator.container.GLArray;
+import com.flightsimulator.container.GLFloatArray;
 import com.flightsimulator.container.GLVertexBuffer;
 import com.flightsimulator.container.Vec.Vec2;
-import com.flightsimulator.shaders.TextureShader;
+import com.flightsimulator.shader.TextureShader;
 import com.flightsimulator.utility.AdvancedGeometry;
+import com.flightsimulator.utility.Constants;
 import com.flightsimulator.utility.BasicGeometry.Circle;
 import com.flightsimulator.utility.BasicGeometry.Point;
 
@@ -38,10 +39,10 @@ public class Joystick extends Control {
 		setIdentityM(baseModelMatrix, 0);
 		setIdentityM(handleModelMatrix, 0);
 		
-		baseData = new GLVertexBuffer(new GLArray(AdvancedGeometry.gen2DCircleFan(base, POINTS_PER_PRIM)));
+		baseData = new GLVertexBuffer(new GLFloatArray(AdvancedGeometry.gen2DCircleFan(base, POINTS_PER_PRIM)), GL_STATIC_DRAW);
 		Circle handle = new Circle(new Point(base.center.x, base.center.y, base.center.z), base.radius * HANDLE_SCALE);
-		handleData = new GLVertexBuffer(new GLArray(AdvancedGeometry.gen2DCircleFan(handle, POINTS_PER_PRIM)));
-		textureData = new GLVertexBuffer(new GLArray(AdvancedGeometry.gen2DCircleFan(textureOutline, POINTS_PER_PRIM)));
+		handleData = new GLVertexBuffer(new GLFloatArray(AdvancedGeometry.gen2DCircleFan(handle, POINTS_PER_PRIM)), GL_STATIC_DRAW);
+		textureData = new GLVertexBuffer(new GLFloatArray(AdvancedGeometry.gen2DCircleFan(textureOutline, POINTS_PER_PRIM)), GL_STATIC_DRAW);
 	}
 	
 	//Coordinates come in as normalized inverse device coordinates to check against bounds
@@ -113,7 +114,7 @@ public class Joystick extends Control {
 		
 		baseData.setVertexAttribPointer(0, program.getPositionAttribLocation(), Constants.NUM_POSITION_COMPONENTS_2D, 0);
 		program.setUniforms(tempMatrix, baseTextureId);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, baseData.getSize() / Constants.NUM_POSITION_COMPONENTS_2D);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, baseData.getBufferSize() / Constants.NUM_POSITION_COMPONENTS_2D);
 		
 		//Handle Drawing
 		normHandleTranslation(orthoMatrix);
@@ -121,8 +122,7 @@ public class Joystick extends Control {
 		
 		handleData.setVertexAttribPointer(0, program.getPositionAttribLocation(), Constants.NUM_POSITION_COMPONENTS_2D, 0);
 		program.setUniforms(tempMatrix, handleTextureId);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, handleData.getSize() / Constants.NUM_POSITION_COMPONENTS_2D);
-	
+		glDrawArrays(GL_TRIANGLE_FAN, 0, handleData.getBufferSize() / Constants.NUM_POSITION_COMPONENTS_2D);
 	}
 	
 	private float normHorizSensitivity() {

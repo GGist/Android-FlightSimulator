@@ -1,4 +1,4 @@
-package com.flightsimulator.ui;
+package com.flightsimulator.ui.widget;
 
 public enum Task {
 	MOVEMENT,

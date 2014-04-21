@@ -14,14 +14,14 @@ import android.widget.Toast;
 
 public class SimulatorActivity extends Activity {
 	
-	private GLSurfaceView mySurfaceView;
+	private GLSurfaceView surfaceView;
 	private boolean rendererSet = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mySurfaceView = new GLSurfaceView(this);
-
+		surfaceView = new GLSurfaceView(this);
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		//Grab OpenGL ES device version information
@@ -29,23 +29,30 @@ public class SimulatorActivity extends Activity {
 		ConfigurationInfo configInfo = activityInfo.getDeviceConfigurationInfo();
 		final boolean supportsEs2 = configInfo.reqGlEsVersion >= 0x20000;
 		
-		final SimulatorRenderer myRenderer = new SimulatorRenderer(this);
+		//System.out.println(activityInfo.getMemoryClass());
+		
+		final SimulatorRenderer renderer = new SimulatorRenderer(this);
 
 		if (supportsEs2) {
-			//Continue with the program
-			mySurfaceView.setEGLContextClientVersion(2);
+			surfaceView.setEGLContextClientVersion(2);
 			
-			mySurfaceView.setRenderer(myRenderer);
+			surfaceView.setRenderer(renderer);
 			rendererSet = true;
 		} else {
 			//Could choose to render using OpenGL ES 1.0
-			//Instead, display error message to the user
-			Toast.makeText(this, "This device does not support OpenGL ES 2.0.", 
-				Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "This device does not support OpenGL ES 2.0.", Toast.LENGTH_LONG)
+			.show();
+			
 	        return;
 		}
 
-		mySurfaceView.setOnTouchListener(new OnTouchListener() {
+		surfaceView.setOnTouchListener(getTouchListener(renderer));
+		
+		setContentView(surfaceView);
+	}
+	
+	private OnTouchListener getTouchListener(final SimulatorRenderer renderer) {
+		return new OnTouchListener() {
 			
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -65,10 +72,10 @@ public class SimulatorActivity extends Activity {
 									final int touchPointer = event.getPointerId(i);
 									final float x = event.getX(i),
 											y = event.getY(i);
-									mySurfaceView.queueEvent(new Runnable() {
+									surfaceView.queueEvent(new Runnable() {
 										@Override
 										public void run() {
-											myRenderer.handleTouch(maskedAction, touchPointer, x, y);
+											renderer.handleTouch(maskedAction, touchPointer, x, y);
 										}
 									});
 							}
@@ -76,10 +83,10 @@ public class SimulatorActivity extends Activity {
 							final int touchPointer = event.getPointerId(event.getActionIndex());
 							final float x = event.getX(event.getActionIndex()),
 									y = event.getY(event.getActionIndex());
-							mySurfaceView.queueEvent(new Runnable() {
+							surfaceView.queueEvent(new Runnable() {
 								@Override
 								public void run() {	
-									myRenderer.handleTouch(maskedAction, touchPointer, x, y);
+									renderer.handleTouch(maskedAction, touchPointer, x, y);
 								}
 							});
 						}
@@ -93,23 +100,20 @@ public class SimulatorActivity extends Activity {
 
 				return false;
 			}
-		});
-		
-		setContentView(mySurfaceView);
+		};
 	}
 	
 	protected void onPause() {
 		super.onPause();
 		if (rendererSet) {
-			mySurfaceView.onPause();
+			surfaceView.onPause();
 		}
 	}
 	
 	protected void onResume() {
 		super.onResume();
 		if (rendererSet) {
-			mySurfaceView.onResume();
+			surfaceView.onResume();
 		}
 	}
-	
 }

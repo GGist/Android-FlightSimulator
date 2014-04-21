@@ -4,51 +4,73 @@ import static android.opengl.GLES20.GL_ARRAY_BUFFER;
 import static android.opengl.GLES20.GL_BYTE;
 import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_SHORT;
-import static android.opengl.GLES20.GL_STATIC_DRAW;
 import static android.opengl.GLES20.glBindBuffer;
 import static android.opengl.GLES20.glBufferData;
+import static android.opengl.GLES20.glBufferSubData;
+import static android.opengl.GLES20.glDeleteBuffers;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glGenBuffers;
 import static android.opengl.GLES20.glVertexAttribPointer;
+import android.util.Log;
 
-import com.flightsimulator.container.GLArray.BufferType;
+import com.flightsimulator.utility.LoggerStatus;
 
-public class GLVertexBuffer {
+public class GLVertexBuffer implements GLBuffer {
 	private static final String TAG = "GLVertexBuffer";
 	
-	private int bufferId, numVertices;
-	private BufferType bufferType;
+	private int usage, id, numVertices;
+	private GLArray.BufferType bufferType;
 	
-	public GLVertexBuffer(GLArray array) {
-		bufferId = genVertexBuffer(array);
+	//bufferUsage is either GL_STREAM_DRAW, GL_STATIC_DRAW, or GL_DYNAMIC_DRAW
+	public GLVertexBuffer(GLArray array, int bufferUsage) {
+		usage = bufferUsage;
+		id = genVertexBuffer(array);
+		numVertices = array.getNumElements();
 		bufferType = array.getBufferType();
-		numVertices = array.getSize();
 	}
 	
-	private int genVertexBuffer(GLArray array) {
-		//Allocate vertex buffer
-		final int buffer[] = new int[2];
-        glGenBuffers(buffer.length, buffer, 0);
-        if (buffer[0] == 0)
-            throw new RuntimeException("Could not create a new vertex buffer object.");
-        
-        //Bind to the allocated vertex buffer
-        glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
-        
-        //Transfer data
-        glBufferData(GL_ARRAY_BUFFER, array.getSizeInBytes(), array.getBuffer(), GL_STATIC_DRAW);
-        //Note: We do not need our GLArray anymore because the gpu has allocated memory to
-        //hold our data from the glBufferData() call
-        
-        //Unbind from the vertex buffer
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        
-        return buffer[0];
+	//As per the OpenGL standard, buffers should only be updated if
+	//DYNAMIC_DRAW was specified as the usage pattern
+	public void updateBuffer(GLArray data) {
+		bindBuffer();
+		
+		glBufferSubData(GL_ARRAY_BUFFER, 0, 
+				data.getNumElements() * data.bytesPerElement(), data.getBuffer());
+		
+		unbindBuffer();
 	}
-	//
+
+	@Override
+	public void bindBuffer() {
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+	}
+
+	@Override
+	public void unbindBuffer() {
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	@Override
+	public void freeBuffer() {
+		glDeleteBuffers(1, new int[] { id }, 0);
+		id = usage = numVertices = 0;
+	}
+
+	@Override
+	public int getBufferSize() {
+		return numVertices;
+	}
+
 	public void setVertexAttribPointer(int dataOffset, int attribLocation,
 			int numComponents, int stride) {
-		glBindBuffer(GL_ARRAY_BUFFER, bufferId);
+		if (id == 0) {
+			if (LoggerStatus.ON)
+				Log.e(TAG, "Buffer was never allocated or has already been delete.");
+			
+			return;
+		}
+		
+		glBindBuffer(GL_ARRAY_BUFFER, id);
 		
 		switch (bufferType)
 		{
@@ -69,7 +91,23 @@ public class GLVertexBuffer {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 	
-	public int getSize() {
-		return numVertices;
+	private int genVertexBuffer(GLArray array) {
+		//Allocate vertex buffer
+		final int buffer[] = new int[1];
+		
+        glGenBuffers(buffer.length, buffer, 0);
+        if (buffer[0] == 0)
+            throw new RuntimeException("Could not create a new vertex buffer object.");
+        
+        //Bind to the allocated vertex buffer
+        glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
+        
+        //Transfer data
+        glBufferData(GL_ARRAY_BUFFER, array.getNumElements() * array.bytesPerElement(), array.getBuffer(), usage);
+        
+        //Unbind from the vertex buffer
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        
+        return buffer[0];
 	}
 }

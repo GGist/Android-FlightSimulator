@@ -1,4 +1,4 @@
-package com.flightsimulator.shaders;
+package com.flightsimulator.shader;
 
 import static android.opengl.GLES20.glGetAttribLocation;
 import static android.opengl.GLES20.glGetUniformLocation;

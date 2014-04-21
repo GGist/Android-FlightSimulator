@@ -2,10 +2,10 @@ uniform mat4 u_Matrix;
 
 attribute vec4 a_Position;
 
-varying vec4 test;
+varying float height;
 
 void main()
 {
-	test = a_Position;
+	height = a_Position.y;
 	gl_Position = u_Matrix * a_Position;
 }

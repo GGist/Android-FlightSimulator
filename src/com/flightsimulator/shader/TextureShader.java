@@ -1,4 +1,4 @@
-package com.flightsimulator.shaders;
+package com.flightsimulator.shader;
 
 import static android.opengl.GLES20.GL_TEXTURE0;
 import static android.opengl.GLES20.GL_TEXTURE_2D;

@@ -1,6 +1,5 @@
 package com.flightsimulator.utility;
 
-import com.flightsimulator.android.Constants;
 import com.flightsimulator.utility.BasicGeometry.Circle;
 import com.flightsimulator.utility.BasicGeometry.Rectangle;
 
